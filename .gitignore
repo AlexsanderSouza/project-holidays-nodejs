@@ -1,0 +1,8 @@
+build/
+# Commonly ignored Node.js files
+node_modules/
+npm-debug.log
+.npm/
+
+.env
+.vscode
