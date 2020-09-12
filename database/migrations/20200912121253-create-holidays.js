@@ -31,9 +31,17 @@ module.exports = {
         values: ['default', 'move'],
         defaultValue: 'default',
       },
-      date: {
-        allowNull: false,
-        type: Sequelize.DATEONLY,
+      year: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+      },
+      month: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+      },
+      day: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
       },
     })
   },

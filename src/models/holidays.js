@@ -1,11 +1,21 @@
 module.exports = (sequelize, DataTypes) => {
-  const Holidays = sequelize.define('holidays', {
-    name: DataTypes.STRING,
-    code: DataTypes.STRING,
-    type: DataTypes.ENUM,
-    date: DataTypes.DATEONLY,
-    timestamps: false,
-  })
+  const holidays = sequelize.define(
+    'holidays',
+    {
+      name: DataTypes.STRING,
+      code: DataTypes.STRING,
+      type: {
+        type: DataTypes.ENUM,
+        values: ['default', 'move'],
+      },
+      year: DataTypes.INTEGER,
+      month: DataTypes.INTEGER,
+      day: DataTypes.INTEGER,
+    },
+    {
+      timestamps: false,
+    }
+  )
 
-  return Holidays
+  return holidays
 }
