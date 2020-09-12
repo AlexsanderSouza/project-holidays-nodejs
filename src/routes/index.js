@@ -1,13 +1,17 @@
-const express = require('express')
+// @ts-nocheck
 
-const router = express.Router()
+const router = require('express-promise-router')()
+const holidaysController = require('../controllers/holydaysController')
 
-router.get('/feriados', (req, res) => {
-  res.status(200).send({
-    success: 'true',
-    message: 'Seja bem-vindo(a) teste',
-    version: '1.0.0',
-  })
-})
+// Definindo as rotas de feriados (holidays)
+
+/* Rota responsável por retornar o feriado */
+router.get('/feriados/:code/:date', holidaysController.findHoliday)
+
+/* Rota responsável por cadastrar e atualizar um feriado */
+router.put('/feriados/:code/:dateOrName', holidaysController.updateHoliday)
+
+/* Rota responsável por excluir um feriado */
+router.delete('/feriados/:code/:date', holidaysController.deleteHoliday)
 
 module.exports = router

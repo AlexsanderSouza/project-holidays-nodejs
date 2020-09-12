@@ -19,6 +19,7 @@ module.exports = {
         {
           name: 'Teste',
           type: 'default',
+          code: '33',
           date: new Date(),
         },
       ],

@@ -21,6 +21,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
       },
+      code: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
       type: {
         allowNull: false,
         type: Sequelize.ENUM,
@@ -29,7 +33,7 @@ module.exports = {
       },
       date: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
     })
   },
@@ -41,6 +45,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    return queryInterface.dropTable('Holidays')
+    return queryInterface.dropTable('holidays')
   },
 }
