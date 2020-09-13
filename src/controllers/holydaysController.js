@@ -16,13 +16,36 @@ const findHoliday = async (req, res) => {
         code: validCode.code,
         codeLeft: validCode.codeLeft,
       })
+      if (!data) {
+        let dataHolidaysMove = await models.holidays.get(
+          {
+            year: null,
+            month: null,
+            day: null,
+            code: validCode.code,
+            codeLeft: validCode.codeLeft,
+          },
+          true,
+          true
+        )
+        if (dataHolidaysMove) {
+          let holidaysMoviment = holidaysMove(validDate.year)
+          Object.keys(dataHolidaysMove).forEach((key) => {
+            let date = `${validDate.year}-${validDate.month}-${validDate.day}`
+            if (compareString(holidaysMoviment[date], dataHolidaysMove[key].name)) {
+              data = dataHolidaysMove[key]
+              return data
+            }
+          })
+        }
+      }
       /* verifica se existe  */
       return data ? res.status(200).send(data) : res.status(404).send()
     } else {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send()
+    return res.status(404).send(error.message)
   }
 }
 
@@ -77,11 +100,7 @@ const deleteHoliday = async (req, res) => {
         false
       )
       /* verifica se o feriado existe e se pode excluir */
-      if (
-        dataGet &&
-        dataGet.code != '0' &&
-        (dataGet.code != validCode.codeLeft || dataGet.code == validCode.code)
-      ) {
+      if (dataGet && dataGet.code != '0' && (dataGet.code != validCode.codeLeft || dataGet.code == validCode.code)) {
         let dataDelete = await models.holidays.delete(
           {
             name: validName.name,
@@ -105,6 +124,31 @@ const deleteHoliday = async (req, res) => {
   }
 }
 
+/* função para comparar strings */
+function compareString(str1, str2) {
+  /* caso algum esteja indefinido, retorna false */
+  if (typeof str1 == 'undefined' || typeof str2 == 'undefined') return false
+  str1 = removeAccents(str1.toLowerCase().split(' ').join(''))
+  str2 = removeAccents(str2.toLowerCase().split(' ').join(''))
+
+  return str1 == str2
+}
+
+/* Função para remover acentos de uma string*/
+function removeAccents(str) {
+  var accents = 'ÀÁÂÃÄÅàáâãäåßÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž-'
+  var accentsOut = 'AAAAAAaaaaaaBOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz'
+  str = str.split('')
+  var strLen = str.length
+  var i, x
+  for (i = 0; i < strLen; i++) {
+    if ((x = accents.indexOf(str[i])) != -1) {
+      str[i] = accentsOut[x]
+    }
+  }
+  return str.join('')
+}
+
 /**
  * verifica se o nome do feriado é valido
  * @param string date
@@ -123,11 +167,7 @@ function validateName(date, body, del = false) {
   })
   if (!isNumber) {
     return { name: name.trim(), move: true }
-  } else if (
-    typeof body.name != 'undefined' &&
-    body.name.trim() != '' &&
-    !del
-  ) {
+  } else if (typeof body.name != 'undefined' && body.name.trim() != '' && !del) {
     return { name: body.name.trim(), move: false }
   } else if (del) {
     return { name: name.trim(), move: false }
@@ -178,10 +218,7 @@ function validateDate(date, put = false) {
   })
   /* valida para os casos de 2 e 3 digitos  */
   if (date.length == 3) {
-    valid =
-      date[0].split('').length == 4 &&
-      date[1].split('').length == 2 &&
-      date[2].split('').length == 2
+    valid = date[0].split('').length == 4 && date[1].split('').length == 2 && date[2].split('').length == 2
 
     valid && valiateDateMinMax(date[1], date[2])
     date = { year: date[0], month: date[1], day: date[2] }
@@ -203,6 +240,51 @@ function validateDate(date, put = false) {
 function valiateDateMinMax(month, day) {
   let valid = month > 0 && month < 13 && day < 32 && day > 0
   return valid
+}
+
+/* soma ou subtrai datas */
+function daysSum(year, month, day, value) {
+  let newDate = new Date(year, month - 1, day)
+  newDate.setDate(newDate.getDate() + value)
+  return new Date(newDate)
+}
+
+/**
+ * calcula os feriados moveis
+ * @param integer year
+ * object
+ */
+function holidaysMove(year) {
+  let a = year % 19
+  let b = parseInt(year / 100)
+  let c = year % 100
+  let d = parseInt(b / 4)
+  let e = b % 4
+  let f = parseInt((b + 8) / 25)
+  let g = parseInt((b - f + 1) / 3)
+  let h = (19 * a + b - d - g + 15) % 30
+  let i = parseInt(c / 4)
+  let k = c % 4
+  let L = (32 + 2 * e + 2 * i - h - k) % 7
+  let m = parseInt((a + 11 * h + 22 * L) / 451)
+  let month = parseInt((h + L - 7 * m + 114) / 31)
+  let day = 1 + ((h + L - 7 * m + 114) % 31)
+
+  /* o Date do javascript vai de 0 a 11 para meses */
+  let pascoa = new Date(year, month - 1, day).toISOString().split('T')[0]
+
+  let carnaval = daysSum(year, month, day, -47).toISOString().split('T')[0]
+
+  let sextaSanta = daysSum(year, month, day, -2).toISOString().split('T')[0]
+
+  let corpusChristi = daysSum(year, month, day, 60).toISOString().split('T')[0]
+
+  return {
+    [pascoa]: 'Páscoa',
+    [carnaval]: 'Carnaval',
+    [sextaSanta]: 'Sexta-Feira Santa',
+    [corpusChristi]: 'Corpus Christi',
+  }
 }
 
 module.exports = {

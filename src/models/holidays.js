@@ -16,29 +16,23 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   /* busca um feriado */
-  holidays.get = async function (param, nationalPriority = true) {
+  holidays.get = async function (param, nationalPriority = true, holidaysMove = false) {
     let orderBy = nationalPriority ? 'ORDER BY YEAR asc' : 'ORDER BY code asc'
     let select = nationalPriority ? 'name' : 'name, code'
+    let isNull = param.day == null ? 'IS' : '='
     let query = `SELECT
                     ${select}
                   FROM
                     holidays
                   WHERE
-                    (YEAR = ? OR YEAR IS NULL)
-                    AND MONTH = ?
-                    AND DAY = ?
+                    (YEAR ${isNull} ? OR YEAR IS NULL)
+                    AND MONTH ${isNull} ?
+                    AND DAY ${isNull} ?
                     AND (code = ?
                     OR code = ?
                     OR code = '0')
-                    ${orderBy}
-                  LIMIT 1`
-    let replacements = [
-      param.year,
-      param.month,
-      param.day,
-      param.code,
-      param.codeLeft,
-    ]
+                    ${orderBy}`
+    let replacements = [param.year, param.month, param.day, param.code, param.codeLeft]
 
     /* realiza a consulta */
     let data = await sequelize.query(query, {
@@ -46,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
       type: QueryTypes.SELECT,
     })
     /* assumindo que não existe mais de um feriado em um unico dia */
-    return data[0] ? data[0] : false
+    return holidaysMove ? data : data[0] ? data[0] : false
   }
 
   /* cria ou atualiza um feriado */
