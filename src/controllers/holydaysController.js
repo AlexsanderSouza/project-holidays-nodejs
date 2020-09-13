@@ -34,7 +34,7 @@ const findHoliday = async (req, res) => {
             let date = `${validDate.year}-${validDate.month}-${validDate.day}`
             if (compareString(holidaysMoviment[date], dataHolidaysMove[key].name)) {
               data = dataHolidaysMove[key]
-              return data
+              return
             }
           })
         }
@@ -163,7 +163,7 @@ function validateName(date, body, del = false) {
   /* verifica se é um numero */
   dateSplit.forEach((number) => {
     if (isNaN(parseInt(number))) isNumber = false
-    name = name + ' ' + number
+    name = name + ' ' + capitalize(number)
   })
   if (!isNumber) {
     return { name: name.trim(), move: true }
@@ -285,6 +285,12 @@ function holidaysMove(year) {
     [sextaSanta]: 'Sexta-Feira Santa',
     [corpusChristi]: 'Corpus Christi',
   }
+}
+
+/* coloca primeira letra de uma string em maiúscula */
+const capitalize = (s) => {
+  if (typeof s !== 'string') return s
+  return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
 module.exports = {
