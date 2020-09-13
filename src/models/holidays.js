@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         (YEAR = ? OR YEAR IS NULL)
         AND MONTH = ?
         AND DAY = ?
-        AND (code = '?'
+        AND (code = ?
         OR code = '0')
         ORDER BY YEAR asc
       LIMIT 1`,
