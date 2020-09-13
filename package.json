@@ -8,7 +8,7 @@
     "lint": "eslint --ext .js,.html -f ./node_modules/eslint-friendly-formatter . --fix",
     "prepush": "npm run lint",
     "start": "node server.js",
-    "build": "npx sequelize db:migrate, npx sequelize db:seed:all"
+    "build": "npx sequelize db:migrate"
   },
   "heroku-run-build-script": true,
   "keywords": [],
