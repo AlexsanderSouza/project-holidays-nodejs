@@ -59,9 +59,49 @@ const updateHoliday = async (req, res) => {
 /* Método responsável por excluir um feriado */
 const deleteHoliday = async (req, res) => {
   try {
-    res.status(200).send({ message: 'Product deleted successfully!', teste: 4 })
+    /* valida a data */
+    let validName = validateName(req.params.dateOrName, req.body, true)
+    let validDate = validateDate(req.params.dateOrName)
+    let validCode = validateCode(req.params.code)
+    /* caso não seja valido retorna erro 404 */
+    if (validDate && validCode && validName) {
+      /* busca o feriado */
+      let dataGet = await models.holidays.get(
+        {
+          year: validDate.year,
+          month: validDate.month,
+          day: validDate.day,
+          code: validCode.code,
+          codeLeft: validCode.codeLeft,
+        },
+        false
+      )
+      /* verifica se o feriado existe e se pode excluir */
+      if (
+        dataGet &&
+        dataGet.code != '0' &&
+        (dataGet.code != validCode.codeLeft || dataGet.code == validCode.code)
+      ) {
+        let dataDelete = await models.holidays.delete(
+          {
+            name: validName.name,
+            month: validDate.month,
+            day: validDate.day,
+            code: validCode.code,
+          },
+          validName.move
+        )
+        if (dataDelete) return res.status(204).send()
+        return res.status(404).send()
+      } else if (dataGet) {
+        return res.status(403).send()
+      }
+      return res.status(404).send()
+    } else {
+      return res.status(404).send()
+    }
   } catch (error) {
-    return res.status(404).send(error.message)
+    return res.status(404).send()
   }
 }
 
@@ -69,9 +109,10 @@ const deleteHoliday = async (req, res) => {
  * verifica se o nome do feriado é valido
  * @param string date
  * @param object body
+ * @param boolean del
  * return object or false
  */
-function validateName(date, body) {
+function validateName(date, body, del = false) {
   let isNumber = true
   let dateSplit = date.split('-')
   let name = ''
@@ -82,8 +123,14 @@ function validateName(date, body) {
   })
   if (!isNumber) {
     return { name: name.trim(), move: true }
-  } else if (body.name.trim() != undefined && body.name.trim() != '') {
+  } else if (
+    typeof body.name != 'undefined' &&
+    body.name.trim() != '' &&
+    !del
+  ) {
     return { name: body.name.trim(), move: false }
+  } else if (del) {
+    return { name: name.trim(), move: false }
   }
   return false
 }

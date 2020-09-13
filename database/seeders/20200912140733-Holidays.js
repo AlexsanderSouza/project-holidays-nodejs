@@ -73,6 +73,13 @@ module.exports = {
           month: 12,
           day: 25,
         },
+        {
+          name: 'Sexta-feira santa',
+          code: '0',
+          year: null,
+          month: null,
+          day: null,
+        },
       ],
       {}
     )

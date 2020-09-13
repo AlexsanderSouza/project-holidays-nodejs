@@ -16,9 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   /* busca um feriado */
-  holidays.get = async function (param) {
+  holidays.get = async function (param, nationalPriority = true) {
+    let orderBy = nationalPriority ? 'ORDER BY YEAR asc' : 'ORDER BY code asc'
+    let select = nationalPriority ? 'name' : 'name, code'
     let query = `SELECT
-                    name
+                    ${select}
                   FROM
                     holidays
                   WHERE
@@ -28,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
                     AND (code = ?
                     OR code = ?
                     OR code = '0')
-                    ORDER BY YEAR asc
+                    ${orderBy}
                   LIMIT 1`
     let replacements = [
       param.year,
@@ -50,6 +52,7 @@ module.exports = (sequelize, DataTypes) => {
   /* cria ou atualiza um feriado */
   holidays.createOrUpdate = async function (param, holidayMove = false) {
     let condition = {}
+    /* verifica se é um feriado movel */
     if (holidayMove) {
       condition = { name: param.name, month: null, day: null, code: param.code }
     } else {
@@ -65,6 +68,22 @@ module.exports = (sequelize, DataTypes) => {
         let objCreated = holidays.create(param)
         return { obj: objCreated, create: true }
       }
+    })
+  }
+
+  /* cria ou atualiza um feriado */
+  holidays.delete = async function (param, holidayMove = false) {
+    let condition = {}
+    /* verifica se é um feriado movel */
+    if (holidayMove) {
+      condition = { name: param.name, month: null, day: null, code: param.code }
+    } else {
+      condition = { month: param.month, day: param.day, code: param.code }
+    }
+    /* remove o feriado */
+    return holidays.destroy({ where: condition }).then(function (rowDeleted) {
+      /* se tudo der certo, retorna true */
+      return rowDeleted === 1
     })
   }
 

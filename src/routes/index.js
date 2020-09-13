@@ -12,6 +12,6 @@ router.get('/feriados/:code/:date', holidaysController.findHoliday)
 router.put('/feriados/:code/:dateOrName', holidaysController.updateHoliday)
 
 /* Rota responsável por excluir um feriado */
-router.delete('/feriados/:code/:date', holidaysController.deleteHoliday)
+router.delete('/feriados/:code/:dateOrName', holidaysController.deleteHoliday)
 
 module.exports = router
