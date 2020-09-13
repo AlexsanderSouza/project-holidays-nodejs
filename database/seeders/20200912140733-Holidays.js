@@ -19,7 +19,6 @@ module.exports = {
       [
         {
           name: 'Ano Novo',
-          type: 'default',
           code: '0',
           year: null,
           month: 1,
@@ -27,7 +26,6 @@ module.exports = {
         },
         {
           name: 'Tiradentes',
-          type: 'default',
           code: '0',
           year: null,
           month: 4,
@@ -35,7 +33,6 @@ module.exports = {
         },
         {
           name: 'Dia do Trabalhador',
-          type: 'default',
           code: '0',
           year: null,
           month: 5,
@@ -43,7 +40,6 @@ module.exports = {
         },
         {
           name: 'Independência',
-          type: 'default',
           code: '0',
           year: null,
           month: 9,
@@ -51,7 +47,6 @@ module.exports = {
         },
         {
           name: 'Nossa Senhora Aparecida',
-          type: 'default',
           code: '0',
           year: null,
           month: 10,
@@ -59,7 +54,6 @@ module.exports = {
         },
         {
           name: 'Finados',
-          type: 'default',
           code: '0',
           year: null,
           month: 11,
@@ -67,7 +61,6 @@ module.exports = {
         },
         {
           name: 'Proclamação da República',
-          type: 'default',
           code: '0',
           year: null,
           month: 11,
@@ -75,7 +68,6 @@ module.exports = {
         },
         {
           name: 'Natal',
-          type: 'default',
           code: '0',
           year: null,
           month: 12,

@@ -25,12 +25,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
       },
-      type: {
-        allowNull: false,
-        type: Sequelize.ENUM,
-        values: ['default', 'move'],
-        defaultValue: 'default',
-      },
       year: {
         allowNull: true,
         type: Sequelize.INTEGER,

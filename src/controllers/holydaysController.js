@@ -14,11 +14,12 @@ const findHoliday = async (req, res) => {
         month: validDate.month,
         day: validDate.day,
         code: validCode.code,
+        codeLeft: validCode.codeLeft,
       })
       /* verifica se existe  */
       return data ? res.status(200).send(data) : res.status(404).send()
     } else {
-      res.status(404).send()
+      return res.status(404).send()
     }
   } catch (error) {
     return res.status(404).send()
@@ -28,8 +29,29 @@ const findHoliday = async (req, res) => {
 /* Método responsável por atualizar um Feriado */
 const updateHoliday = async (req, res) => {
   try {
-    // holidays.create({ name: 'teste3', code: 'teste' })
-    res.status(200).send({ message: 'holiday Updated Successfully!' })
+    /* valida a data */
+    let validName = validateName(req.params.dateOrName, req.body)
+    let validDate = validateDate(req.params.dateOrName, true)
+    let validCode = validateCode(req.params.code)
+    console.log(validName, validDate, validCode)
+    /* caso não seja valido retorna erro 404 */
+    if (validDate && validCode && validName) {
+      let data = await models.holidays.createOrUpdate(
+        {
+          name: validName.name,
+          month: validDate.month,
+          day: validDate.day,
+          code: validCode.code,
+        },
+        validName.move
+      )
+      if (data.create) {
+        return res.status(201).send(data)
+      }
+      return res.status(200).send(data)
+    } else {
+      return res.status(404).send()
+    }
   } catch (error) {
     return res.status(404).send(error.message)
   }
@@ -42,6 +64,22 @@ const deleteHoliday = async (req, res) => {
   } catch (error) {
     return res.status(404).send(error.message)
   }
+}
+
+/**
+ * verifica se o nome do feriado é valido
+ * @param string date
+ * @param object body
+ * return object or false
+ */
+function validateName(date, body) {
+  date = date.split('-')
+  if (date.length == 1) {
+    return { name: date[0], move: true }
+  } else if (body.name.trim() != '') {
+    return { name: body.name.trim(), move: false }
+  }
+  return false
 }
 
 /**
@@ -69,12 +107,19 @@ function validateCode(code) {
  * @param string date = data
  * return object or false
  */
-function validateDate(date) {
+function validateDate(date, put = false) {
   let valid
   date = date.split('-')
   /* verifica se é um numero */
   date.forEach((number) => {
-    if (!parseInt(number)) return false
+    if (isNaN(parseInt(number))) {
+      if (put) {
+        date = { year: null, month: null, day: null }
+        valid = true
+      } else {
+        valid = false
+      }
+    }
   })
   /* valida para os casos de 2 e 3 digitos  */
   if (date.length == 3) {
@@ -90,9 +135,8 @@ function validateDate(date) {
     valid = date[0].split('').length == 2 && date[1].split('').length == 2
     valid = valid && valiateDateMinMax(date[0], date[1])
     date = { year: null, month: date[0], day: date[1] }
-  } else if (date.length == 1) {
-    return 'teset'
   }
+
   return valid ? date : false
 }
 
