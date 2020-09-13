@@ -33,7 +33,6 @@ const updateHoliday = async (req, res) => {
     let validName = validateName(req.params.dateOrName, req.body)
     let validDate = validateDate(req.params.dateOrName, true)
     let validCode = validateCode(req.params.code)
-    console.log(validName, validDate, validCode)
     /* caso não seja valido retorna erro 404 */
     if (validDate && validCode && validName) {
       let data = await models.holidays.createOrUpdate(
@@ -46,14 +45,14 @@ const updateHoliday = async (req, res) => {
         validName.move
       )
       if (data.create) {
-        return res.status(201).send(data)
+        return res.status(201).send()
       }
-      return res.status(200).send(data)
+      return res.status(200).send()
     } else {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send(error.message)
+    return res.status(404).send()
   }
 }
 
@@ -73,10 +72,17 @@ const deleteHoliday = async (req, res) => {
  * return object or false
  */
 function validateName(date, body) {
-  date = date.split('-')
-  if (date.length == 1) {
-    return { name: date[0], move: true }
-  } else if (body.name.trim() != '') {
+  let isNumber = true
+  let dateSplit = date.split('-')
+  let name = ''
+  /* verifica se é um numero */
+  dateSplit.forEach((number) => {
+    if (isNaN(parseInt(number))) isNumber = false
+    name = name + ' ' + number
+  })
+  if (!isNumber) {
+    return { name: name.trim(), move: true }
+  } else if (body.name.trim() != undefined && body.name.trim() != '') {
     return { name: body.name.trim(), move: false }
   }
   return false
@@ -89,12 +95,14 @@ function validateName(date, body) {
  */
 function validateCode(code) {
   let codeSplit = code.split('')
+  let valid = true
   /* verifica se possui a quantidade de caracteres permitidas */
   if (codeSplit.length == 2 || codeSplit.length == 7) {
     /* verifica se é um numero */
     codeSplit.forEach((number) => {
-      if (!parseInt(number)) return false
+      if (isNaN(parseInt(number))) valid = false
     })
+    if (!valid) return false
     let codeSubstring = code.substring(0, 2)
     code = { codeLeft: codeSubstring, code: code }
     return code
