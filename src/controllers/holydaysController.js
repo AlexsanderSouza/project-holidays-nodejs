@@ -45,7 +45,7 @@ const findHoliday = async (req, res) => {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send()
+    return res.status(404).send(error.message)
   }
 }
 
@@ -75,7 +75,7 @@ const updateHoliday = async (req, res) => {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send()
+    return res.status(404).send(error.message)
   }
 }
 
@@ -84,7 +84,7 @@ const deleteHoliday = async (req, res) => {
   try {
     /* valida a data */
     let validName = validateName(req.params.dateOrName, req.body, true)
-    let validDate = validateDate(req.params.dateOrName)
+    let validDate = validateDate(req.params.dateOrName, true)
     let validCode = validateCode(req.params.code)
     /* caso não seja valido retorna erro 404 */
     if (validDate && validCode && validName) {
@@ -96,8 +96,11 @@ const deleteHoliday = async (req, res) => {
           day: validDate.day,
           code: validCode.code,
           codeLeft: validCode.codeLeft,
+          name: validName.name,
         },
-        false
+        false,
+        false,
+        validName.move
       )
       /* verifica se o feriado existe e se pode excluir */
       if (dataGet && dataGet.code != '0' && (dataGet.code != validCode.codeLeft || dataGet.code == validCode.code)) {
@@ -120,7 +123,7 @@ const deleteHoliday = async (req, res) => {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send()
+    return res.status(404).send(error.message)
   }
 }
 

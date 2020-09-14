@@ -1,4 +1,4 @@
-const { QueryTypes } = require('sequelize')
+const { QueryTypes, Op } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   const holidays = sequelize.define(
@@ -16,23 +16,38 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   /* busca um feriado */
-  holidays.get = async function (param, nationalPriority = true, holidaysMove = false) {
+  holidays.get = async function (param, nationalPriority = true, holidaysMove = false, holidaysMoveDelete = false) {
     let orderBy = nationalPriority ? 'ORDER BY YEAR asc' : 'ORDER BY code asc'
     let select = nationalPriority ? 'name' : 'name, code'
     let isNull = param.day == null ? 'IS' : '='
+    let moveDelete = ''
+    let replacements = []
+    /* verifica se precisa buscar pelo nome */
+    if (holidaysMoveDelete) {
+      moveDelete = `(YEAR ${isNull} ? OR YEAR IS NULL)
+                      AND MONTH ${isNull} ?
+                      AND DAY ${isNull} ?
+                      AND unaccent(name) = unaccent(?)
+                      AND (code = ?
+                      OR code = ?
+                      OR code = '0')`
+      replacements = [param.year, param.month, param.day, param.name, param.code, param.codeLeft]
+    } else {
+      moveDelete = `(YEAR ${isNull} ? OR YEAR IS NULL)
+                      AND MONTH ${isNull} ?
+                      AND DAY ${isNull} ?
+                      AND (code = ?
+                      OR code = ?
+                      OR code = '0')`
+      replacements = [param.year, param.month, param.day, param.code, param.codeLeft]
+    }
     let query = `SELECT
                     ${select}
                   FROM
                     holidays
                   WHERE
-                    (YEAR ${isNull} ? OR YEAR IS NULL)
-                    AND MONTH ${isNull} ?
-                    AND DAY ${isNull} ?
-                    AND (code = ?
-                    OR code = ?
-                    OR code = '0')
+                    ${moveDelete}
                     ${orderBy}`
-    let replacements = [param.year, param.month, param.day, param.code, param.codeLeft]
 
     /* realiza a consulta */
     let data = await sequelize.query(query, {
@@ -70,15 +85,23 @@ module.exports = (sequelize, DataTypes) => {
     let condition = {}
     /* verifica se é um feriado movel */
     if (holidayMove) {
-      condition = { name: param.name, month: null, day: null, code: param.code }
+      condition = { month: null, day: null, code: param.code }
+      condition = [
+        sequelize.where(sequelize.fn('unaccent', sequelize.col('name')), sequelize.fn('unaccent', param.name)),
+        condition,
+      ]
     } else {
       condition = { month: param.month, day: param.day, code: param.code }
     }
     /* remove o feriado */
-    return holidays.destroy({ where: condition }).then(function (rowDeleted) {
-      /* se tudo der certo, retorna true */
-      return rowDeleted === 1
-    })
+    return holidays
+      .destroy({
+        where: condition,
+      })
+      .then(function (rowDeleted) {
+        /* se tudo der certo, retorna true */
+        return rowDeleted === 1
+      })
   }
 
   return holidays
