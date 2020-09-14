@@ -4,7 +4,7 @@ const models = require('../models')
 const findHoliday = async (req, res) => {
   try {
     /* valida a data */
-    let validDate = validateDate(req.params.date)
+    let validDate = validateDate(req.params.date, false, true)
     let validCode = validateCode(req.params.code)
     /* caso a data não seja valida retorna erro 404 */
     if (validDate && validCode) {
@@ -205,7 +205,7 @@ function validateCode(code) {
  * @param string date = data
  * return object or false
  */
-function validateDate(date, put = false) {
+function validateDate(date, put = false, get = false) {
   let valid = true
   date = date.split('-')
   /* verifica se é um numero */
@@ -221,13 +221,14 @@ function validateDate(date, put = false) {
   })
   /* se for invalido retorna false */
   if (!valid) return false
+  valid = false
   /* valida para os casos de 2 e 3 digitos  */
   if (date.length == 3) {
     valid = date[0].split('').length == 4 && date[1].split('').length == 2 && date[2].split('').length == 2
 
     valid && validateDateMinMax(date[1], date[2])
     date = { year: date[0], month: date[1], day: date[2] }
-  } else if (date.length == 2) {
+  } else if (date.length == 2 && !get) {
     /* valida para os casos de 2 digitos  */
     valid = date[0].split('').length == 2 && date[1].split('').length == 2
     valid = valid && validateDateMinMax(date[0], date[1])

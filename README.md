@@ -13,6 +13,10 @@ npm run start
 npx sequelize db:migrate
 npx sequelize db:seed:all
 ```
+- executar query no banco postgres
+```bash
+CREATE EXTENSION unaccent;
+```
 - O endpoint para consultar feriados:
 ```
 /feriados/CODIGO-IBGE/ANO-MES-DIA/

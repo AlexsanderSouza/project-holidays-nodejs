@@ -1,4 +1,4 @@
-const { QueryTypes, Op } = require('sequelize')
+const { QueryTypes } = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
   const holidays = sequelize.define(
