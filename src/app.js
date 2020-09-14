@@ -3,8 +3,8 @@ const cors = require('cors')
 
 const app = express()
 
-// ==> Rotas da API:
-const index = require('./routes/index')
+/* Rotas da API */
+const index = require('./routes/holidaysRoute')
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())

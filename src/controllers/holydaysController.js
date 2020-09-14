@@ -16,6 +16,7 @@ const findHoliday = async (req, res) => {
         code: validCode.code,
         codeLeft: validCode.codeLeft,
       })
+      /* caso não retorne algum feriado, procura se tem feriados moveis */
       if (!data) {
         let dataHolidaysMove = await models.holidays.get(
           {
@@ -28,6 +29,7 @@ const findHoliday = async (req, res) => {
           true,
           true
         )
+        /* se tiver feriados moveis cadastrados, verifica se é feriado utilizando algoritmo de Meeus*/
         if (dataHolidaysMove) {
           let holidaysMoviment = holidaysMove(validDate.year)
           Object.keys(dataHolidaysMove).forEach((key) => {
