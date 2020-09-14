@@ -56,6 +56,7 @@ const updateHoliday = async (req, res) => {
     let validName = validateName(req.params.dateOrName, req.body)
     let validDate = validateDate(req.params.dateOrName, true)
     let validCode = validateCode(req.params.code)
+    console.log(validName, validDate, validCode)
     /* caso não seja valido retorna erro 404 */
     if (validDate && validCode && validName) {
       let data = await models.holidays.createOrUpdate(
@@ -209,6 +210,7 @@ function validateCode(code) {
  */
 function validateDate(date, putOrDel = false, get = false) {
   let valid = true
+  let isNumber = true
   date = date.split('-')
   /* verifica se é um numero */
   date.forEach((number) => {
@@ -216,6 +218,7 @@ function validateDate(date, putOrDel = false, get = false) {
       if (putOrDel) {
         date = { year: null, month: null, day: null }
         valid = true
+        isNumber = false
       } else {
         valid = false
       }
@@ -223,7 +226,7 @@ function validateDate(date, putOrDel = false, get = false) {
   })
   /* se for invalido retorna false */
   if (!valid) return false
-  valid = false
+  valid = isNumber ? false : true
   /* valida para os casos de 2 e 3 digitos  */
   if (date.length == 3 && !putOrDel) {
     valid = date[0].split('').length == 4 && date[1].split('').length == 2 && date[2].split('').length == 2
