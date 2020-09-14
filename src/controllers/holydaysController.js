@@ -58,7 +58,6 @@ const updateHoliday = async (req, res) => {
     let validName = validateName(req.params.dateOrName, req.body)
     let validDate = validateDate(req.params.dateOrName, true)
     let validCode = validateCode(req.params.code)
-    console.log(validName, validDate, validCode)
     /* caso não seja valido retorna erro 404 */
     if (validDate && validCode && validName) {
       let data = await models.holidays.createOrUpdate(
