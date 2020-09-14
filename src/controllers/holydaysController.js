@@ -47,7 +47,7 @@ const findHoliday = async (req, res) => {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send(error.message)
+    return res.status(404).send()
   }
 }
 
@@ -78,7 +78,7 @@ const updateHoliday = async (req, res) => {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send(error.message)
+    return res.status(404).send()
   }
 }
 
@@ -126,7 +126,7 @@ const deleteHoliday = async (req, res) => {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send(error.message)
+    return res.status(404).send()
   }
 }
 
