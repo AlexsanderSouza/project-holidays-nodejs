@@ -45,7 +45,7 @@ const findHoliday = async (req, res) => {
       return res.status(404).send()
     }
   } catch (error) {
-    return res.status(404).send(error.message)
+    return res.status(404).send()
   }
 }
 
@@ -203,7 +203,7 @@ function validateCode(code) {
  * return object or false
  */
 function validateDate(date, put = false) {
-  let valid
+  let valid = true
   date = date.split('-')
   /* verifica se é um numero */
   date.forEach((number) => {
@@ -216,16 +216,18 @@ function validateDate(date, put = false) {
       }
     }
   })
+  /* se for invalido retorna false */
+  if (!valid) return false
   /* valida para os casos de 2 e 3 digitos  */
   if (date.length == 3) {
     valid = date[0].split('').length == 4 && date[1].split('').length == 2 && date[2].split('').length == 2
 
-    valid && valiateDateMinMax(date[1], date[2])
+    valid && validateDateMinMax(date[1], date[2])
     date = { year: date[0], month: date[1], day: date[2] }
   } else if (date.length == 2) {
     /* valida para os casos de 2 digitos  */
     valid = date[0].split('').length == 2 && date[1].split('').length == 2
-    valid = valid && valiateDateMinMax(date[0], date[1])
+    valid = valid && validateDateMinMax(date[0], date[1])
     date = { year: null, month: date[0], day: date[1] }
   }
 
@@ -237,9 +239,39 @@ function validateDate(date, put = false) {
  * @param interger month = mês
  * @param integer day = dia
  */
-function valiateDateMinMax(month, day) {
-  let valid = month > 0 && month < 13 && day < 32 && day > 0
+function validateDateMinMax(month, day) {
+  month = parseInt(month)
+  day = parseInt(day)
+  let maxDay = maxDaysOfMonth(month)
+  let valid = month > 0 && month < 13 && day <= maxDay && day > 0
   return valid
+}
+
+/**
+ * retorna o maximo de dias de um determinado mês
+ * @param integer month
+ * return integer
+ */
+function maxDaysOfMonth(month) {
+  switch (month) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 10:
+    case 12:
+      return 31
+    case 4:
+    case 6:
+    case 9:
+    case 11:
+      return 30
+    case 2:
+      return 29
+    default:
+      return 0
+  }
 }
 
 /* soma ou subtrai datas */
