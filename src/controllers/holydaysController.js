@@ -203,15 +203,17 @@ function validateCode(code) {
 /**
  * verifica se é uma data valida
  * @param string date = data
+ * @param boolean putOrdel = se a requisição é put ou delete
+ * @param boolean get = se a requisição é get
  * return object or false
  */
-function validateDate(date, put = false, get = false) {
+function validateDate(date, putOrDel = false, get = false) {
   let valid = true
   date = date.split('-')
   /* verifica se é um numero */
   date.forEach((number) => {
     if (isNaN(parseInt(number))) {
-      if (put) {
+      if (putOrDel) {
         date = { year: null, month: null, day: null }
         valid = true
       } else {
@@ -223,7 +225,7 @@ function validateDate(date, put = false, get = false) {
   if (!valid) return false
   valid = false
   /* valida para os casos de 2 e 3 digitos  */
-  if (date.length == 3) {
+  if (date.length == 3 && !putOrDel) {
     valid = date[0].split('').length == 4 && date[1].split('').length == 2 && date[2].split('').length == 2
 
     valid && validateDateMinMax(date[1], date[2])
