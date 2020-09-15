@@ -23,7 +23,12 @@ CREATE EXTENSION unaccent;
 ```
 Onde CODIGO-IBGE é o codigo do estado ou município e ANO-MES-DIA tem o formato "AAAA-MM-DD"
 ## .env
-- o arquivo .env precisa da URL da base de dados caso seja postgres no seguinte formato
+O arquivo .env precisa da URL da base de dados caso seja postgres no seguinte formato
 ```
 DATABASE_URL=postgres://{db_username}:{db_password}@{host}:{port}/{db_name}
+```
+## teste:
+Para rodar os testes, vá até a pasta tests na raiz do projeto e execute o comando:
+```bash
+k6 run -e API_BASE='http://localhost:3000' tests-open.js
 ```
