@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 const router = require('express-promise-router')()
 const holidaysController = require('../controllers/holydaysController')
 
