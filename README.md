@@ -19,7 +19,24 @@ CREATE EXTENSION unaccent;
 ```
 - O endpoint para consultar feriados:
 ```
-/feriados/CODIGO-IBGE/ANO-MES-DIA/
+GET /feriados/CODIGO-IBGE/ANO-MES-DIA/
+```
+- Exemplo de cadastro do aniversário de São Paulo SP no dia 25 de Janeiro:
+```
+PUT /feriados/3550308/01-25/
+{
+    "name": "Aniversário da cidade de São Paulo"
+}
+```
+- Exemplo de remoção do aniversário de São Paulo:
+```
+DELETE /feriados/3550308/01-25/
+```
+- Cadastro e remoção de feriados móveis
+```
+PUT /feriados/5108402/carnaval/
+PUT /feriados/4312658/corpus-christi/
+DELETE /feriados/5108402/carnaval/
 ```
 Onde CODIGO-IBGE é o codigo do estado ou município e ANO-MES-DIA tem o formato "AAAA-MM-DD"
 ## .env
