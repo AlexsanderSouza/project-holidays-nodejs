@@ -1,4 +1,4 @@
-# API FERIADOS
+# API FERIADOS NODE.JS
 ## como usar:
 - executar comando para ambiente de desenvolvimento
 ```bash
